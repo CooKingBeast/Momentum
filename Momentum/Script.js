@@ -11,6 +11,9 @@ const weatherDescription = document.querySelector(".weather-description");
 const citySelector = document.querySelector(".city");
 const windSelector = document.querySelector(".wind");
 const humiditySelector = document.querySelector(".humidity");
+const quoteSelector = document.querySelector(".quote");
+const authorSelector = document.querySelector(".author");
+const changeQuoteSelector = document.querySelector(".change-quote")
 
 citySelector.addEventListener("change", () => {
   getWeather(citySelector.value);
@@ -19,7 +22,7 @@ window.addEventListener("beforeunload", setLocalStorage);
 window.addEventListener("load", getLocalStorage);
 slideNextSelector.addEventListener("click", getSlideNext);
 slidePrevSelector.addEventListener("click", getSlidePrev);
-
+changeQuoteSelector.addEventListener("click", getQuotes);
 let randomNum = getRandomInt(1, 21);
 
 function showDate() {
@@ -131,8 +134,10 @@ async function getWeather(cityInput) {
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput}&lang=en&appid=4ada66ddf05802af358c8b69ed55adaf&units=metric`;
   const res = await fetch(url);
   const data = await res.json();
-  tempRound = Math.round(data.main.temp);
-  windSpeedRound = Math.round(data.wind.speed);
+
+  const tempRound = Math.round(data.main.temp);
+  const windSpeedRound = Math.round(data.wind.speed);
+
   weatherIcon.classList.add(`owf-${data.weather[0].id}`);
   temperature.textContent = `${tempRound}°C`;
   weatherDescription.textContent = data.weather[0].description;
@@ -140,4 +145,14 @@ async function getWeather(cityInput) {
   humiditySelector.textContent = `Humidity: ${data.main.humidity} %`;
 }
 getWeather();
+
+async function getQuotes() {  
+  const quotes = '../Quotes.json';
+  const res = await fetch(quotes);
+  const data = await res.json(); 
+  const randomQuote = getRandomInt(0, 102);
+  quoteSelector.textContent = data[randomQuote].quote;
+  authorSelector.textContent = data[randomQuote].author;
+}
+getQuotes();
 
