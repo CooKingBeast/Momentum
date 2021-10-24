@@ -9,6 +9,8 @@ const weatherIcon = document.querySelector(".weather-icon");
 const temperature = document.querySelector(".temperature");
 const weatherDescription = document.querySelector(".weather-description");
 const citySelector = document.querySelector(".city");
+const windSelector = document.querySelector(".wind");
+const humiditySelector = document.querySelector(".humidity");
 
 citySelector.addEventListener("change", () => {
   getWeather(citySelector.value);
@@ -119,24 +121,23 @@ function showTime() {
   const date = new Date();
   const currentTime = date.toLocaleTimeString();
   timeSelector.textContent = currentTime;
-  //setTimeout(showTime, 1000);
+  setTimeout(showTime, 1000);
   showDate();
   showGreeting();
 }
 showTime();
 
-async function getWeather(hyi) {
-  console.log(citySelector.value, " test city");
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${hyi}&lang=en&appid=4ada66ddf05802af358c8b69ed55adaf&units=metric`;
-
+async function getWeather(cityInput) {
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput}&lang=en&appid=4ada66ddf05802af358c8b69ed55adaf&units=metric`;
   const res = await fetch(url);
-  //console.log(res,'res');
   const data = await res.json();
-  //console.log(data,'data');
-  console.log(data.weather[0].id, data.weather[0].description, data.main.temp);
-
+  tempRound = Math.round(data.main.temp);
+  windSpeedRound = Math.round(data.wind.speed);
   weatherIcon.classList.add(`owf-${data.weather[0].id}`);
-  temperature.textContent = `${data.main.temp}°C`;
+  temperature.textContent = `${tempRound}°C`;
   weatherDescription.textContent = data.weather[0].description;
+  windSelector.textContent = `Wind speed: ${windSpeedRound} m/s`;
+  humiditySelector.textContent = `Humidity: ${data.main.humidity} %`;
 }
 getWeather();
+
