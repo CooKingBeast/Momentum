@@ -1,3 +1,5 @@
+import playList from "./playList.js";
+
 const dateSelector = document.querySelector(".date");
 const greetingSelector = document.querySelector(".greeting");
 const nameSelector = document.querySelector(".name");
@@ -13,7 +15,12 @@ const windSelector = document.querySelector(".wind");
 const humiditySelector = document.querySelector(".humidity");
 const quoteSelector = document.querySelector(".quote");
 const authorSelector = document.querySelector(".author");
-const changeQuoteSelector = document.querySelector(".change-quote")
+const changeQuoteSelector = document.querySelector(".change-quote");
+const audioSelector = document.querySelector("audio");
+const playSelector = document.querySelector(".play");
+const playPrevSelector = document.querySelector(".play-prev");
+const playNextSelector = document.querySelector(".play-next");
+const playListSelector = document.querySelector(".play-list");
 
 citySelector.addEventListener("change", () => {
   getWeather(citySelector.value);
@@ -23,7 +30,25 @@ window.addEventListener("load", getLocalStorage);
 slideNextSelector.addEventListener("click", getSlideNext);
 slidePrevSelector.addEventListener("click", getSlidePrev);
 changeQuoteSelector.addEventListener("click", getQuotes);
+playSelector.addEventListener("click", () => {
+  playAudio();
+});
+playPrevSelector.addEventListener("click", playPrev);
+playNextSelector.addEventListener("click", playNext);
+
 let randomNum = getRandomInt(1, 21);
+let isPlay = false;
+let playNum = 0;
+
+playList.forEach((item) => {
+  const li = document.createElement("li");
+  li.classList.add("play-item");
+  li.textContent = item.title;
+  playListSelector.append(li);
+  // if(isPlay){
+  //   li.classList.add("item-active")
+  // }
+});
 
 function showDate() {
   const date = new Date();
@@ -55,7 +80,7 @@ function getTimeOfDay() {
       timeOfDay = "evening";
       break;
 
-    case hours >= 0 && hours < 06:
+    case hours >= 0 && hours < 6:
       timeOfDay = "night";
       break;
 
@@ -100,21 +125,21 @@ function setBg(randomNum) {
 }
 setBg(randomNum);
 
-function getSlideNext() {
-  if (randomNum < 20) {
-    randomNum += 1;
-  } else {
-    randomNum = 1;
-  }
-  console.log(randomNum, "123");
-  setBg(randomNum);
-}
-
 function getSlidePrev() {
   if (randomNum >= 2) {
     randomNum -= 1;
   } else {
     randomNum = 20;
+  }
+  console.log(randomNum, "123");
+  setBg(randomNum);
+}
+
+function getSlideNext() {
+  if (randomNum < 20) {
+    randomNum += 1;
+  } else {
+    randomNum = 1;
   }
   console.log(randomNum, "123");
   setBg(randomNum);
@@ -146,13 +171,49 @@ async function getWeather(cityInput) {
 }
 getWeather();
 
-async function getQuotes() {  
-  const quotes = '../Quotes.json';
+async function getQuotes() {
+  const quotes = "../Quotes.json";
   const res = await fetch(quotes);
-  const data = await res.json(); 
+  const data = await res.json();
   const randomQuote = getRandomInt(0, 102);
   quoteSelector.textContent = data[randomQuote].quote;
   authorSelector.textContent = data[randomQuote].author;
 }
 getQuotes();
+
+const audio = new Audio();
+
+function playAudio() {
+  audio.src = playList[playNum].src;
+  if (!isPlay) {
+    audio.currentTime = 0;
+    audio.play();
+    isPlay = true;
+    playSelector.classList.add("pause");
+  } else {
+    audio.pause();
+    isPlay = false;
+    playSelector.classList.remove("pause");
+  }
+}
+
+function playPrev() {
+  playNum -= 1;
+  if (playNum < 0) {
+    playNum = 3;
+  }
+  audio.src = audio[playNum];
+  isPlay = false;
+  playAudio();
+}
+
+function playNext() {
+  playNum += 1;
+  if (playNum > 3) {
+    playNum = 0;
+  }
+  audio.src = audio[playNum];
+  isPlay = false;
+  playAudio();
+}
 
